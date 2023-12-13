@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Entity\Member;
 use App\Importer\ImporterMembers;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -20,8 +21,12 @@ class ImportMemberListCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $onMemberImport = function (Member $member) use ($output) {
+            $output->writeln("<info>Member imported: {$member->getMepId()} {$member->getFullName()}</info>");
+        };
+
         try {
-            $this->importerMembers->importMemberList();
+            $this->importerMembers->importMemberList($onMemberImport);
 
             return Command::SUCCESS;
         } catch (Exception $e) {

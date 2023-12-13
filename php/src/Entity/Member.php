@@ -4,9 +4,12 @@ namespace App\Entity;
 
 use App\Entity\Trait\Creatable;
 use App\Repository\MemberRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use DateTime;
 
 #[ORM\Entity(repositoryClass: MemberRepository::class)]
 #[ORM\HasLifecycleCallbacks]
@@ -26,6 +29,12 @@ class Member
     #[Assert\NotBlank]
     private ?string $fullName = null;
 
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?DateTime $contactsSavedAt = null;
+
+    #[ORM\OneToMany(mappedBy: "member", targetEntity: MemberContact::class)]
+    private Collection $contacts;
+
     #[ORM\ManyToOne(targetEntity: Country::class, inversedBy: 'members')]
     private Country $country;
 
@@ -34,6 +43,11 @@ class Member
 
     #[ORM\ManyToOne(targetEntity: NationalPoliticalGroup::class, inversedBy: 'members')]
     private NationalPoliticalGroup $nationalPoliticalGroup;
+
+    public function __construct()
+    {
+        $this->contacts = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -58,6 +72,16 @@ class Member
     public function setFullName(string $fullName): void
     {
         $this->fullName = $fullName;
+    }
+
+    public function getContactsSavedAt(): ?DateTime
+    {
+        return $this->contactsSavedAt;
+    }
+
+    public function setContactsSavedAt(?DateTime $contactsSavedAt): void
+    {
+        $this->contactsSavedAt = $contactsSavedAt;
     }
 
     public function getCountry(): Country

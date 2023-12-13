@@ -28,13 +28,18 @@ class MemberManager
     ) {
     }
 
-    public function createMember(MemberListData $memberData): Member
+    public function save(Member $member): Member
     {
-        $existedMember = $this->memberRepository->findOneBy(['mepId' => $memberData->id]);
-        if ($existedMember instanceof Member) {
-            return $existedMember;
-        }
+        return $this->memberRepository->save($member);
+    }
 
+    public function findByMepId(int $mepId): ?Member
+    {
+        return $this->memberRepository->findOneBy(['mepId' => $mepId]);
+    }
+
+    public function createMember(MemberListData $memberData): ?Member
+    {
         $member = new Member();
         $member->setMepId((int) $memberData->id);
         $member->setFullName($memberData->fullName);
